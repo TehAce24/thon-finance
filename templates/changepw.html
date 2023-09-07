@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Change Password
+{% endblock %}
+
+{% block main %}
+
+    <form action="/changepw" method="post">
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password">
+        </div>
+        <div class="mb-3">
+            <input class="form-control mx-auto w-auto" id="newpw" name="newpw" placeholder="New Password" type="password">
+        </div>
+        <div class="mb-3">
+            <input class="form-control mx-auto w-auto" id="confirm-newpw" name="confirm-newpw" placeholder="Confirm Password" type="password">
+        </div>
+        <button class="mb-2 d-inline-flex align-items-center btn btn-primary btn-sm px-3" type="submit">
+            Change Password
+            <svg class="bi ms-0" width="24" height="24"><i class="fa-solid fa-lock"></i></svg>
+        </button>
+    </form>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == 'password_empty' %}
+                    <div class="{{ category }}"></div>
+                {% elif category == 'password_match' %}
+                    <div class="{{ category }}"></div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+{% endblock %}

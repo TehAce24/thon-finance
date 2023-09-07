@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              var signup = document.getElementById("signup");
+              var signuplink = document.getElementById("signuplink");
+
+              signuplink.addEventListener("mouseover", function() {
+                console.log("Mouse over");
+                signup.classList.add("fa-bounce");
+              });
+
+              signuplink.addEventListener("mouseout", function() {
+                console.log("Mouse out");
+                signup.classList.remove("fa-bounce");
+              });
+            });
+        </script>
+    <div class=container>
+        <form action="/login" method="post">
+            <div class="mb-3">
+                <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text">
+            </div>
+            <div class="mb-3">
+                <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password">
+            </div>
+            <button class="mb-2 d-inline-flex align-items-center btn btn-primary btn-sm px-4" type="submit">
+                Log In
+                <svg class="bi ms-2" width="24" height="24"><i class="fa-solid fa-lock"></i></svg>
+            </button>
+            <div class="mb-3">
+                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" name="remember">
+                    <label class="form-check-label" for="flexCheckDefault">
+                        Remember me
+                    </label>
+                </div>
+        </form>
+    </div>
+    <div class="mb-0">
+        <a class="fw-bold fs-7 text-decoration-none" id="signuplink" href="/register">Sign-Up <span><i id="signup" class="fa-solid fa-key"></i></span></a>
+    </div>
+{% endblock %}
+

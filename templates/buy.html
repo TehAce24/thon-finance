@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Buy
+{% endblock %}
+
+{% block main %}
+
+<div class="p-5 text-center bg-body-tertiary rounded-3">
+    <h2 class="pb-2 border-bottom text-center">Buy Shares</h2>
+    <p class="col-lg-8 mx-auto fs-5 text-muted">
+        <form action="/buy" method="post">
+            <div class="mb-3">
+                <input autocomplete="off" autofocus="" class="form-control mx-auto w-auto" name="symbol" placeholder="$ymbol" type="text">
+            </div>
+            <div class="mb-3">
+                <input autocomplete="off" class="form-control mx-auto w-auto" min="1" name="shares" placeholder="Shares" type="number">
+            </div>
+            <div class="d-inline-flex gap-2 mb-5">
+                <button class="d-inline-flex align-items-center btn btn-primary btn-lg px-4 rounded-pill" type="submit">
+                    Submit
+                    <svg class="bi ms-2" width="24" height="24"><i class="fa-solid fa-coins"></i></svg>
+                </button>
+            </div>
+        </form>
+    </p>
+</div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == 'invalid-symbol' %}
+                    <div class="{{ category }}"></div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Homepage
+{% endblock %}
+
+{% block main %}
+
+<main class="container py-5 text-center">
+
+    <table class="table table-striped" id='index-table'>
+        <thead>
+            <tr>
+                <th class="text-start">Symbol</th>
+                <th class="text-start">Name</th>
+                <th class="text-end">Shares</th>
+                <th class="text-end">Price</th>
+                <th class="text-end">TOTAL</th>
+            </tr>
+        </thead>
+       <tbody>
+                {% for purchase in portfolio %}
+                <tr>
+                    <td class="text-start">{{ purchase.symbol }}</td>
+                    <td class="text-start">{{ purchase.name }}</td>
+                    <td class="text-end">{{ purchase.shares }}</td>
+                    <td class="text-end">{{ purchase.price | usd }}</td>
+                    <th class="text-end">{{ purchase.total | usd }}</th>
+                </tr>
+                {% endfor %}
+                {% if price_float %}
+                <th class="text-end">{{ total | usd }}</th>
+                <th class="text-end">{{ price_float | usd }}</th>
+                <th class="text-end">{{ prices | usd }}</th>
+                {% endif %}
+        </tbody>
+    </table>
+    <table class="table table-striped">
+        <tfoot>
+            <tr>
+                <td class="border-0 fw-bold text-end">Cash</td>
+                <td class="border-0 text-end">${{ session["cash"] }}</td>
+            </tr>
+            <tr>
+                <td class="border-0 fw-bold text-end">TOTAL</td>
+                <td class="border-0 w-bold text-end">{{ all_shares | usd }}</td>
+            </tr>
+        </tfoot>
+    </table>
+
+        </main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == 'purchased' %}
+                    <div class="{{ category }}"></div>
+                {% elif category == 'sold' %}
+                    <div class="{{ category }}"></div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Quote
+{% endblock %}
+
+{% block main %}
+
+
+<div class="container px-4 py-5">
+  <div>
+    <h2 class="pb-2 border-bottom text-start">Find a Quote Today!<span>
+      <h5 class="pb-2 text-end">{{ current_date }} {{ current_time }}</h5>
+    </span></h2>
+  </div>
+    <div class="row row-cols-1 row-cols-md-2 align-items-md-center g-5 py-5">
+      <div class="col d-flex flex-column align-items-start gap-2">
+        <h2 class="fw-bold text-body-emphasis">Enter Symbol</h2>
+            <form action="/quote" method="post">
+                <div class="mb-3">
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="symbol" name="symbol" placeholder="$ymbol" type="text">
+                </div>
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </form>
+      </div>
+
+      <div class="col">
+        <div class="row row-cols-1 row-cols-sm-2 g-4">
+          <div class="col d-flex flex-column gap-2">
+            <div class="feature-icon-small d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-4 rounded-3">
+              <svg class="bi" width="0em" height="1em">
+                <i class="fa-solid fa-scale-balanced fa-2xl"></i>
+              </svg>
+            </div>
+            <h4 class="fw-semibold mb-0 text-body-emphasis">Name:</h4>
+            <h1 class="text-body-secondary">
+                {% if info %}
+                    {{ info["name"] }}
+                {% endif %}
+            </h1>
+          </div>
+
+          <div class="col d-flex flex-column gap-2">
+            <div class="feature-icon-small d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-4 rounded-3">
+              <svg class="bi" width="0em" height="1em">
+                <i class="fa-solid fa-chart-line fa-2xl"></i>
+              </svg>
+            </div>
+            <h4 class="fw-semibold mb-0 text-body-emphasis">Price:</h4>
+            <h1 class="text-body-secondary">
+                {% if info %}
+                    {{ info["price"] | usd }}
+                {% endif %}
+            </h1>
+          </div>
+
+          <div class="col d-flex flex-column gap-2">
+            <div class="feature-icon-small d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-4 rounded-3">
+              <svg class="bi" width="0em" height="1em">
+                <i class="fa-solid fa-chart-pie fa-2xl"></i>
+              </svg>
+            </div>
+            <h4 class="fw-semibold mb-0 text-body-emphasis">Volume:</h4>
+            <h1 class="text-body-secondary">
+                {% if info %}
+                    {{ info["volume"] }}
+                {% endif %}
+            </h1>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == 'invalid-symbol' %}
+                    <div class="{{ category }}"></div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+{% endblock %}
