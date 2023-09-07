@@ -19,9 +19,14 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-# Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///finance.db")
+# Configure SQLite database
+# db = SQL("sqlite:///finance.db")
+uri = os.getenv("DATABASE_URL")
+if uri.startswith("postgre://"):
+    uri = uri.replace("postgres://", "postgresql://")
+db = SQL(uri)
 
+# Get current time
 now = datetime.now()
 current_date = now.strftime("%m-%d-%Y")
 current_time = now.strftime("%H:%M:%S")
@@ -51,8 +56,12 @@ def index():
             symbol = stock_info["symbol"]
             total_shares = price * int(purchases["shares"])
             total += total_shares
-            db.execute("UPDATE portfolio SET price = ? WHERE user_id = ? AND symbol = ?", price, session["user_id"], name)
-            db.execute("UPDATE portfolio SET total = ? WHERE user_id = ? AND symbol = ?", total_shares, session["user_id"], name)
+            db.execute("UPDATE portfolio SET price = ? WHERE user_id = ? AND symbol = ?",
+                       price, session["user_id"], name)
+
+            db.execute("UPDATE portfolio SET total = ? WHERE user_id = ? AND symbol = ?",
+                       total_shares, session["user_id"], name)
+
     all_shares = total_value()
     return render_template("index.html", portfolio=portfolio, total=total, all_shares=all_shares)
 
@@ -107,11 +116,22 @@ def buy():
                 db.execute("UPDATE users SET cash = ? WHERE id = ?", new_cash, session["user_id"])
 
                 # Add new row in transactions table
-                db.execute("INSERT INTO transactions (transaction_type, user_id, symbol, name, shares, price, total, date, time)\
-                            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", "BUY", session["user_id"], symbol, name, bought_shares, price, total, current_date, current_time)
+                db.execute("INSERT INTO transactions "
+                           "(transaction_type, user_id, symbol, name, shares, price, total, date, time)\
+                            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                           "BUY",
+                           session["user_id"],
+                           symbol,
+                           name,
+                           bought_shares,
+                           price,
+                           total,
+                           current_date,
+                           current_time)
 
                 # Get the current amount of shares the user has
-                get_current_shares = db.execute("SELECT shares FROM portfolio WHERE user_id = ? AND symbol = ?", session["user_id"], name)
+                get_current_shares = db.execute("SELECT shares FROM portfolio WHERE user_id = ? AND symbol = ?",
+                                                session["user_id"], name)
                 if get_current_shares:
                     current_shares = get_current_shares[0]["shares"]
                 else:
@@ -123,9 +143,15 @@ def buy():
                 # the symbol and updates it
                 portfolio = db.execute("SELECT * FROM portfolio WHERE user_id = ?", session["user_id"])
                 for purchase in portfolio:
-                    if (name == purchase["symbol"] and session["user_id"] == purchase["user_id"]):
-                        db.execute("UPDATE portfolio SET shares = ? WHERE user_id = ? AND symbol = ?", new_shares, session["user_id"], name)
-                        db.execute("UPDATE portfolio SET total = ? WHERE user_id = ? AND symbol = ?", new_total, session["user_id"], name)
+                    if name == purchase["symbol"] and session["user_id"] == purchase["user_id"]:
+                        db.execute("UPDATE portfolio SET shares = ? WHERE user_id = ? AND symbol = ?",
+                                   new_shares,
+                                   session["user_id"],
+                                   name)
+                        db.execute("UPDATE portfolio SET total = ? WHERE user_id = ? AND symbol = ?",
+                                   new_total,
+                                   session["user_id"],
+                                   name)
                         portfolio = db.execute("SELECT * FROM portfolio WHERE user_id = ?", session["user_id"])
                         flash("Purchase Successful!", category="purchased")
                         all_shares = total_value()
@@ -286,7 +312,8 @@ def sell():
         get_shares = request.form.get("shares")
 
         # Get current amount of shares for symbol from user portfolio
-        shares_amount = db.execute("SELECT shares FROM portfolio WHERE user_id = ? AND symbol = ?", session["user_id"], get_symbol)
+        shares_amount = db.execute("SELECT shares FROM portfolio WHERE user_id = ? AND symbol = ?",
+                                   session["user_id"], get_symbol)
         if not shares_amount:
             return apology("no stocks found", 400)
 
@@ -339,15 +366,30 @@ def sell():
                 cash_float = float(new_cash)
 
                 db.execute("UPDATE users SET cash = ? WHERE id = ?", cash_float, session["user_id"])
-                db.execute("INSERT INTO transactions (transaction_type, user_id, symbol, name, shares, price, total, date, time)\
-                            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", "SELL", session["user_id"], symbol, name, sold_shares, price, total, current_date, current_time)
+                db.execute("INSERT INTO transactions "
+                           "(transaction_type, user_id, symbol, name, shares, price, total, date, time)\
+                            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                           "SELL",
+                           session["user_id"],
+                           symbol,
+                           name,
+                           sold_shares,
+                           price,
+                           total,
+                           current_date,
+                           current_time)
+
                 flash("Sold!", category="sold")
 
                 new_total = shares_left * price
 
                 # Update values in portfolio
-                db.execute("UPDATE portfolio SET shares = ? WHERE user_id = ? AND symbol = ?", shares_left, session["user_id"], name)
-                db.execute("UPDATE portfolio SET total = ? WHERE user_id = ? AND symbol = ?", new_total, session["user_id"], name)
+                db.execute("UPDATE portfolio SET shares = ? WHERE user_id = ? AND symbol = ?",
+                           shares_left, session["user_id"], name)
+
+                db.execute("UPDATE portfolio SET total = ? WHERE user_id = ? AND symbol = ?",
+                           new_total, session["user_id"], name)
+
                 portfolio = db.execute("SELECT * FROM portfolio WHERE user_id = ?", session["user_id"])
                 all_shares = total_value()
                 return redirect("/")
@@ -357,6 +399,7 @@ def sell():
                 return apology("invalid symbol", 403)
     else:
         return render_template("sell.html", get_stocks=get_stocks)
+
 
 def total_value():
     portfolio = db.execute("SELECT * FROM portfolio WHERE user_id = ?", session["user_id"])
