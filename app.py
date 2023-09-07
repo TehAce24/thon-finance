@@ -20,11 +20,11 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Configure SQLite database
-# db = SQL("sqlite:///finance.db")
-uri = os.getenv("DATABASE_URL")
-if uri.startswith("postgre://"):
+db = SQL("sqlite:///finance.db")
+'''uri = os.getenv("DATABASE_URL")
+if uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://")
-db = SQL(uri)
+db = SQL(uri)'''
 
 # Get current time
 now = datetime.now()
@@ -414,9 +414,9 @@ def total_value():
     return total
 
 
-@app.route("/changepw", methods=["GET", "POST"])
+@app.route("/change", methods=["GET", "POST"])
 @login_required
-def changepw():
+def change():
     current_password = db.execute("SELECT hash FROM users WHERE id = ?", session["user_id"])
     if request.method == "POST":
         password = request.form.get("password")
@@ -445,3 +445,7 @@ def changepw():
 
     else:
         return render_template("changepw.html")
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
