@@ -64,12 +64,13 @@ def lookup(symbol):
         quotes = list(csv.DictReader(response.content.decode("utf-8").splitlines()))
         quotes.reverse()
         price = round(float(quotes[0]["Adj Close"]), 2)
-        # volume = int(quotes[0]["Volume"])
-        # format_volume = '{:,}'.format(volume)
+        volume = int(quotes[0]["Volume"])
+        format_volume = '{:,}'.format(volume)
         return {
             "name": symbol,
             "price": price,
             "symbol": symbol,
+            "volume": format_volume,
         }
     except (requests.RequestException, ValueError, KeyError, IndexError):
         return None
